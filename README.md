@@ -1,192 +1,296 @@
-## Sort Algorithms
+## Merge Sort Algorithm
 
-If you think about it, a lot of what we ask computers to do involves placing items in the correct order.  For example, if you have a recommendation system like Netflix, these recommendations have should be delivered in the correct order.  But something more basic like displaying apartment listings from highest to lowest also involves sorting.  
+### Background
 
+We embark on learning about the merge sort algorithm with the hope that we can improve upon selection sort.  When we say improve we mean with the hope that we can find a sorting algorithm that has a big o less than n^2.  
 
-### Benefits of Sorted Array
+### The Merge Operation
 
-In previous lessons on algorithms, we discussed how much easier other problems get if our collection is sorted.  For example, if we have to see if an array includes the number one, and our array is sorted, we know that after guessing that a number may be at a random index, we know if we need to look higher or lower.  We called this technique **binary search**.  If we guess incorrectly with an unsorted array, we have only ruled out one location where the number cannot be.
+Learning about merge sort begins with a leap of faith.  
+
+https://0lem.files.wordpress.com/2012/03/indiana-leap-of-faith.jpg
+
+The faith is the following.  We will start with an unsorted array.  And ultimately we can turn that unsorted array into two *sorted* subarrays.
 
 ```javascript
-  let sortedArray = [-1, 1, 3, 5, 6]
-  array[2]
-  // 3
-  // so know need to look lower, only need to look at indices 0 and 1
+  let unsortedArray =  [7, 1, 2, 8, 6, 10, 4, 3, 9, 5]
 
-  let unsortedArray = [5, 6 -1, 1, 3]
-  array[2]
-  // -1
-  // so guess again
+
+  // sorted subarrays
+  let firstHalf =  [1, 2, 6, 7, 8]
+  let secondHalf =  [3, 4, 5, 9, 10]
 ```
 
-However there are other operations that become easier with a sorted array.
-  * minimum
-  * maxiumum
-  * median
-
-So, now that we know some of the benefits, how do we do it.
-
-### Selection Sort
+Take a look at these two arrays, they are not filled with sequential numbers, but each array is independently sorted.  Later on we will figure out how to get there.  But first, assuming that we have those two sorted subarrays, how would we turn that into an algorithm that produces a sorted array.  We will call this algorithm our merge function.
 
 ```javascript
-let unsortedArray = [5, 6 -1, 1, 3]
+let firstHalf =  [1, 2, 6, 7, 8]
+let secondHalf =  [3, 4, 5, 9, 10]
 
-```
-
-Ok, so given the unsorted array above, if we asked you to place the numbers from lowest to highest could you do it?  What would be the first step?  So go ahead and sort the algorithm, then describe in words what your brain is doing, and finally we'll translate these words into code.
-
-```javascript
-
-  // Think
-
-  // Think
-
-  // Think
-  let unsortedArray = [5, 6 -1, 1, 3]
+merge(firstHalf, secondHalf)
+// [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 ```
 
-Ok, so perhaps what you did was first find the minimum number, remove the minimum from the array, then find the minimum of the remaining numbers, and so on until there are no numbers left in the array.  
+Ok, so given these two subarrays, how would you get to the final sorted array.  Hmmmmmmmmmmm...
+
+Ok, well what we could go from the following insight.  The minimum of each subarray has to be at the zero index.  So the minimum of firstHalf is firstHalf[0] and the minimum of secondHalf is secondHalf[0].  Now what is the minimum of the two halves, well its whichever of these two minimums is smaller.  So, given two sorted subarrays, let's find the minimum.  
 
 ```javascript
+let firstHalf =  [1, 2, 6, 7, 8]
+let secondHalf =  [3, 4, 5, 9, 10]
 
-  let unsortedArray = [5, 6 -1, 1, 3]
+function findMin(firstHalf, secondHalf){
+  let minfirstHalf = firstHalf[0]
+  let minsecondHalf = secondHalf[0]
 
-  // findthemin given our original array, and remove that element
-
-  // now with the new array, findthemin again, and remove that element
-
-  // keep doing this until our unsortedArray is empty
-
-  // Push these removed elements into an empty array one by one, and that empty array will be our sorted array.
-```
-
-Now translate this into code.  
-
-> We still don't know how to find that minimum and remove the element, but we can pretend we had that function, and then write it later.
-
-```javascript
-  let sortedArray = []
-  let unsortedArray = [5, 6, -1, 1, 3]
-  minAndRemove(unsortedArray, sortedArray)
-  sortedArray
-    // [-1]
-  unsortedArray
-  // [5, 6, 1, 3]
-  minAndRemove(unsortedArray, sortedArray)
-  sortedArray
-  // [-1, 1]
-  unsortedArray
-  // [5, 6, 3]
-```
-
-And how do we write our minAndRemove function? Well we just go through the numbers one by one, holding onto the smallest number.  We set our min equal to the first element in the array, as we know ultimately it will be replaced by the true minimum.
-
-```javascript
-  function minAndRemove(array){
-    let min = array[0]
-    let minIndex = 0
-    for(let i = 0; i < array.length; i++){
-      let currentElement = array[i]
-      if(array[i] < min){
-        min = array[i]
-        minIndex = i
-      }
-    }
-    array.splice(minIndex, 1);
-    return min;
+  if(minfirstHalf < minsecondHalf){
+    return minfirstHalf
+  } else {
+    return minsecondHalf
   }
+}
+
+findMin(firstHalf, secondHalf)
+// 1
 ```
 
-Now check that this piece of code is working.
+And thinking about how this turns into a sorted array, upon finding the minimum, we can remove the element and push it into another array.  So we are back to writing a findMinAndRemove function, except this time it is for two sorted subarrays.
 
 ```javascript
-  let unsortedArray = [5, 6, -1, 1, 3]
-  minAndRemove(unsortedArray)
-  // -1
-  unsortedArray
-  // [5, 6, 1, 3]
+
+let firstHalf =  [1, 2, 6, 7, 8]
+let secondHalf =  [3, 4, 5, 9, 10]
+
+function findMinAndRemove(firstHalf, secondHalf){
+  let minfirstHalf = firstHalf[0]
+  let minsecondHalf = secondHalf[0]
+
+  if(minfirstHalf < minsecondHalf){
+    return firstHalf.shift()
+  } else {
+    return secondHalf.shift()
+  }
+}
+
+findMinAndRemove(firstHalf, secondHalf)
+// 1
+
+firstHalf
+// [2, 6, 7, 8]
 ```
 
-Now placing this together, we said that we must call this until there are no other elements left in this array.  Again, write out the words, and then translate it into code.
-
+Now, just like with selection sort, to arrive at our sorted array, we just have to keep calling our findMinAndRemove function until there are no elements left - ie. both subarrays are empty.  We said that we call this process of going from sorted subarrays to a sorted array our merge function.
 
 ```javascript
-  function selectionSort(array){
-    let newMin;
+  let firstHalf =  [1, 2, 6, 7, 8]
+  let secondHalf =  [3, 4, 5, 9, 10]
+
+  function merge(firstHalf, secondHalf){
     let sorted = []
-    while(array.length != 0){
-      newMin = minAndRemove(array)
-      sorted.push(newMin)
+    let currentMin;
+    while(firstHalf.length != 0 && secondHalf.length != 0){
+      let currentMin = findMinAndRemove(firstHalf, secondHalf)
+      sorted.push(currentMin)
     }
-    return sorted;
+    return sorted.concat(firstHalf).concat(secondHalf)
   }
 ```
 
-### Lessons Learned
-
-We just learned how to implement selection sort.  But we also learned that by following the correct process, we don't need to rely on memorization - which generally is unreliable.  Also, we can take this process with us to other problems we haven't seen.  What was our process?
-
-  A. Problem Solving
-    1. Give ourselves an example
-    2. See if our brain can solve the problem
-    3. Think about how our brain is able to solve the problem, slow down and translate this into words
-
-  B. Coding in small steps
-    1. After writing these words, translate these words into code
-    2. It's ok to call on functions that we need to write later
-    3. After getting one piece of the code working, test that the small piece of code works
-
-Yes, this process is a lot to remember.  So it's best not to remember it.  It's better to be disciplined about following this process, whenever you get stuck.  Eventually, it will become a habit.  We'll build more into our process as we go on. Good developers don't lean on their intelligence to solve a problem - that's too hard to improve - they lean on their process.  That, more than knowing the ins and outs of a language - is what makes them good.
-
-### What's the big O
-
-First, let's summarize our process for selection sort: find the minimum and remove elements until there are no more elements left in the original array.  How many times do we have to call our minAndRemove function, well one for each element in the array (as we remove one element each time, and keep going until the array is empty).  Ok, so n times, we incur a cost of minAndRemove.
-
-Now that we have broken this problem down, let's figure out the cost of minAndRemove.  In the minAndRemove function, we go through each element, and then remove it.  
+So let's quickly look at the function above.  Our merge function for given two subarrays continues to call findMinAndRemove until one of our arrays is empty.  Then once one of the arrays is empty, we know that other array only has the remaining sorted elements.  So we can simply concatenate the remaining elements onto the end of our array.  So in the example above, when the function hits the return statement, sorted array, firstHalf and secondHalf will look like the following:
 
 ```javascript
-function minAndRemove(array){
-  let min = array[0]
-  let minIndex = 0
-  for(let i = 0; i < array.length; i++){
-    let currentElement = array[i]
-    if(array[i] < min){
-      min = array[i]
-      minIndex = i
-    }
+  sorted
+    // [1, 2, 3, 4, 5, 6, 7, 8]
+  firstHalf
+    // []
+  secondHalf
+    // [9, 10]
+  sorted.concat(firstHalf).concat(secondHalf)
+  // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+```
+
+And what is the big o of merge(firstHalf, secondHalf)
+
+```javascript
+function merge(firstHalf, secondHalf){
+  let sorted = []
+  let currentMin;
+  while(firstHalf.length != 0 && secondHalf.length != 0){
+    let currentMin = findMinAndRemove(firstHalf, secondHalf)
+    sorted.push(currentMin)
   }
-  array.splice(minIndex, 1);
-  return min;
+  return sorted.concat(firstHalf).concat(secondHalf)
 }
 
 ```
-So the cost of minAndRemove is n.  
 
-> Note: If you remember, we said that removing elements from an array costs us n.  But note that we only remove the element one time, at the very end.  So our big O would be n + n = 2n.  And because we can simplify big o to not include what we multiply by, we say that the big o of minAndRemove is n.  
+Well the worse case scenario is that we go through the cost of every element in each array.  Or, to say it a different way, the worse case scenario is that we pass through our while loop once for each element in each array.  We cannot go through the loop more than that, because each time through our while loop we remove an element.  So the cost of merging two subarrays is firstHalf.length + secondHalf.length or simply the original array's length, or n.
 
-And we said previously that we have to call minAndRemove n times.
+Ok, so now that we have written out the merge operation, now let's go back to entire mergeSort function.
 
 ```javascript
-  function selectionSort(array){
-    let newMin;
-    let sorted = []
-    while(array.length != 0){
-      newMin = minAndRemove(array)
-      sorted.push(newMin)
+  function mergeSort(array){
+    if(array.length < 2){
+      return array
+    } else {
+      let midpoint = array.length/2
+      let firstHalf = array.slice(0, midpoint)
+      let secondHalf = array.slice(midpoint, array.length)
+      merge(mergeSort(firstHalf), mergeSort(secondHalf))
     }
-    return sorted;
   }
 ```
 
-So the cost of selection sort is n squared.  Which, we could have derived at by just counting the total number of loops.
+Believe it or not, that is our entire mergeSort function.  
 
-  > Note: A subtle point only for the bothered.  Some may ask whether this cost should be less than n^2.  After all, it seems that each time we call minAndRemove on a smaller array, so the cost of minAndRemove shouldn't be n each time, but rather be one less than it was previously.  Let's continue with this logic - it's technically correct.  The first time we call minAndRemove the cost is n, the second time we call it the cost is n - 1, all the way down until the cost is one.  
+If the array is just one element, mergeSort returns that array.  (An array of length one is automatically sorted)
 
-  > On average though the cost of minAndRemove is (1/2)*n.  This is because the first time the cost is n, and the last time it is zero.  Now remember that with big O, we don't consider the multipliers, so the cost of minAndRemove is still n, and therefore the cost of selection sort is n^2.
+So now let's try to understand the second half of the function.  
+
+```javascript
+  let array =  [1, 2, 6, 7, 8, 3, 4, 5, 9, 10]
+
+  mergeSort(array)
+```
+
+So the first thing this will do, is split the array into two halves.
+
+```javascript
+
+function mergeSort(array){
+  if(array.length < 2){
+    return array
+  } else {
+    let midpoint = array.length/2
+    let firstHalf = array.slice(0, midpoint)
+    let secondHalf = array.slice(midpoint, array.length)
+    merge(mergeSort(firstHalf), mergeSort(secondHalf))
+  }
+
+  // [1, 2, 6, 7, 8]
+   // [3, 4, 5, 9, 10]
+
+}
+```
+Then at the last line of the function, it passes the firstHalf of the array to the merge sort function, and the second half of the array to the merge sort function.  So, this means that until we get to the merge part, are we are doing is splitting down into smaller and smaller components.
+
+```javascript
+  let array =  [2, 1, 7, 6, 8, 3, 4, 5]
+
+
+  mergeSort(array)
+  // [2, 1, 7, 6]      [8, 3, 4, 5]
+  // [2, 1] [7, 6]   [8, 3] [4, 5]
+  // [2] [1] [7] [6] [8] [3] [4] [5]
+```
+
+Once we get down to an array with length one, the only thing left to occur is the merge operation at each level.  And that merge operation occurs from the bottom level up.  So it's really:
+```javascript
+merge([2], [1]) merge([7],[6])  merge([8], [3])  merge([4], [5])
+// this merge operation combines the two arrays into an ordered array
+// at the higher level up
+merge([1, 2], [6, 7]) merge([3, 8], [4, 5])
+
+merge([1, 2, 6, 7], [3, 4, 5, 8])
+
+// [1, 2, 3, 4, 5, 6, 7, 8]
+```
+
+Ok, so that's mergeSort.  It consists of splitting the array in half until the subarrays have length one.  And then when you have subarrays of length one, you combine them call the merge operation which returns increasingly larger subarrays that are now sorted, until you have your final sorted array.  
+
+### Calculating big O
+
+So the merge sort function is written like this:
+
+```javascript
+
+function mergeSort(array){
+  if(array.length < 2){
+    return array
+  } else {
+    let midpoint = array.length/2
+    let firstHalf = array.slice(0, midpoint)
+    let secondHalf = array.slice(midpoint, array.length)
+    merge(mergeSort(firstHalf), mergeSort(secondHalf))
+  }
+}
+```
+And we can think of it as doing the following:
+
+```javascript
+let array =  [1, 2, 6, 7, 8, 3, 4, 5, 9, 10]
+mergeSort(array)
+
+// 1. Splitting up
+// [2, 1, 7, 6]      [8, 3, 4, 5]
+// [2, 1] [7, 6]   [8, 3] [4, 5]
+// [2] [1] [7] [6] [8] [3] [4] [5]
+
+// 2. Merge
+// merge([2], [1]) merge([7],[6])  merge([8], [3])  merge([4], [5])
+// merge([1, 2], [6, 7]) merge([3, 8], [4, 5])
+// merge([1, 2, 6, 7], [3, 4, 5, 8])
+```
+
+So how costly is something like this.  Well let's calculate the merging section first.  Notice that for an array of length 8, our merge section has three levels.  So notice that it's three levels because we split our array in half until the length is one.  So how many times do you have to split an array in half until the length is one?  log(n).  
+
+> We said that the definition of log(n) is the number of times you have to press divide by 2 on a calculator until you get to one.  
+
+Ok so the height of this merge section is log(n).  Now what is the cost at our first level.  
+```javascript
+// merge([2], [1]) merge([7],[6])  merge([8], [3])  merge([4], [5])
+```
+
+Well remember we said that the cost of merge is `firstHalf.length + secondHalf.length`.  So at the first level that merge operation occurs four times for a cost of two each.  At the second level merge occurs twice for a cost of four each, and at the final level merge happens once for a cost of eight.  In other words, what is the cost at each level, n.  
+
+```javascript
+
+// merge([2], [1]) merge([7],[6])  merge([8], [3])  merge([4], [5])
+  2 + 2 + 2 + 2 = 8
+// merge([1, 2], [6, 7]) merge([3, 8], [4, 5])
+  4 + 4 = 8
+// merge([1, 2, 6, 7], [3, 4, 5, 8])
+  8
+```
+
+So each level costs n, and how much levels are there?  There are log n levels.  So the cost of merging is n*log n.  Now we still didn't cover the cost of splitting.  Let's look at the splitting stage again.
+
+```javascript
+
+let array =  [1, 2, 6, 7, 8, 3, 4, 5, 9, 10]
+mergeSort(array)
+
+// 1. Splitting up
+// [2, 1, 7, 6]      [8, 3, 4, 5]
+// [2, 1] [7, 6]   [8, 3] [4, 5]
+// [2] [1] [7] [6] [8] [3] [4] [5]
+
+```
+
+So splitting occurs three times, and splitting an array in half does not cost n.  It costs the same regardless of the size of the array.  How many times does the splitting operation occur?  log n times.  This is because we continue to split the array in half until the array's length is one. So the cost of splitting is log n.  
+
+So we can say that the big o of merge sort is the total cost of splitting plus the total cost of merging or log n + n log n.  Now in big o we only consider the largest exponent, and because n * log n is larger than log n the big o is n log n.
+
+### So what?
+
+Remember we started out the lesson with trying to improve upon selection sort.  Remember that selection sort cost us n^2.  Well in this example of sorting an array of eight elements n log n = 24 while n^2 = 64.  If n = 1000 then n^2 = 1,000,000 while n log n = 9,965.  So when is one thousand selection sort takes over a hundred times longer than merge sort.  That's significant.
+
+Going forward, you can assume that the cost of sorting an array is n log n.  And now you know the steps involved in sorting an array.
 
 ### Summary
 
-How to sort an array is a common problem that computers must solve.  We saw that we can sort an array through selection sort, simply by following the process that our brains would generally do.  That is continue to find the minimum of our starting array and remove elements until there are no elements left.  We find the minimum of an unsorted array simply by traversing the elements one by one.
+Merge sort involves two large components, recursively splitting up the array into smaller and smaller subarrays until the size of the array is one or smaller, and the merge step of looking at the first element of each subarray to find the min of both of them.  Mergesort can be expressed with the following pseudocode:
 
-In finding the big O, because the cost of finding the minimum of an unsorted array is n, and we must find the minimum n times, our cost of selection sort is n*n or n^2.  
+```javascript
+  function mergeSort(array){
+    if(array.length < 2){
+      return array;
+    } else {
+      merge(mergeSort(firstHalfArray), mergeSort(secondHalfArray))
+    }
+    return sorted.concat(firstHalf).concat(secondHalf)
+  }
+```
+
+Using our old recursive trick of looking of defining a solution in terms of the name of the function we see that a merge-sorted array is the same as merging two subarrays which are both merge-sorted. 
