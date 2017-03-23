@@ -171,9 +171,7 @@ merge([1, 2, 6, 7], [3, 4, 5, 8])
 
 
 ### Summary 
-Ok, so that's mergeSort.  It consists of splitting the array in half until the subarrays have length one.  And then when you have subarrays of length one, you combine them call the merge operation which returns increasingly larger subarrays that are now sorted, until you have your final sorted array. It has a nice recursive solution that can be expressed with the following pseudocode: 
-
-Mergesort can be expressed with the following pseudocode:
+Ok, so that's mergeSort.  It has a nice recursive solution that can be expressed with the following pseudocode: 
 
 ```javascript
   function mergeSort(array){
@@ -184,4 +182,6 @@ Mergesort can be expressed with the following pseudocode:
     }
   }
 ```
+
+It consists of splitting the array in half until the subarrays have length one.  And then when you have subarrays of length one, you combine them call the merge operation which returns increasingly larger subarrays that are now sorted, until you have your final sorted array. 
 
