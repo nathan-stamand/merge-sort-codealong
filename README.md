@@ -118,7 +118,7 @@ Finally, we find our base case, which is that when our array has only one elemen
     if(array.length < 2){
       return array
     } else {
-      merge(mergeSort(firstHalf), mergeSort(secondHalf))
+      return merge(mergeSort(firstHalf), mergeSort(secondHalf))
     }
   }
 ```
@@ -185,3 +185,5 @@ Ok, so that's mergeSort.  It has a nice recursive solution that can be expressed
 
 It consists of splitting the array in half until the subarrays have length one.  And then when you have subarrays of length one, you combine them call the merge operation which returns increasingly larger subarrays that are now sorted, until you have your final sorted array. 
 
+
+<p class='util--hide'>View <a href='https://learn.co/lessons/merge-sort-codealong'>Merge Sort Codealong</a> on Learn.co and start learning to code for free.</p>
