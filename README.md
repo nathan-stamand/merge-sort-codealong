@@ -27,7 +27,6 @@ So the first step is to take the unsorted list and break it up.
 ```javascript
 merge([7],[1]) merge([2], [8])  merge([6], [10]) merge([4], [3])
 ```
-
 Now think about what this gives us.  Well the merge operation takes two sorted arrays and combines them into one sorted array.  So merging pairs of eight sorted arrays, produces four sorted arrays, which we can then merge again.
 
 ```javascript
